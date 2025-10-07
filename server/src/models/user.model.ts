@@ -1,37 +1,22 @@
-import getConnection from "../config/database";
+// src/models/user.model.ts
+import { pool } from "../config/database";
 
-const handleGetAllUser = async () => {
-  const connection = await getConnection();
-  try {
-    const [results] = await connection.query("SELECT * FROM `users`");
-    return results;
-  } catch (err) {
-    console.error(err);
-    throw err;
-  } finally {
-    connection.release(); // ĐÂY LÀ QUAN TRỌNG
-  }
+export type UserRow = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  password: string; // plaintext (tạm thời để test)
 };
 
-const registerNewUser = async (
-  name: string,
+export async function findUserByEmailAndPassword(
   email: string,
-  password: string,
-  phone: string
-) => {
-  const connection = await getConnection();
-  try {
-    const sql =
-      "INSERT INTO `users`(`name`,`email`,`password`,`phone`) VALUES (?,?,?,?)";
-    const values = [name, email, password, phone];
-    const [results] = await connection.execute(sql, values);
-    return results;
-  } catch (err) {
-    console.error(err);
-    throw err;
-  } finally {
-    connection.release(); // ĐÂY LÀ QUAN TRỌNG
-  }
-};
-
-export { registerNewUser, handleGetAllUser };
+  password: string
+): Promise<Omit<UserRow, "password"> | null> {
+  const [rows] = await pool.query(
+    "SELECT id, name, email, phone FROM users WHERE email = ? AND password = ? LIMIT 1",
+    [email, password]
+  );
+  const arr = rows as any[];
+  return arr.length ? arr[0] : null;
+}

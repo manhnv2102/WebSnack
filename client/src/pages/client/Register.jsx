@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -12,6 +13,8 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -30,7 +33,7 @@ const Register = () => {
 
     try {
       // Gọi API
-      const response = await axios.post("http://localhost:8080/api/users", {
+      const response = await axios.post("http://localhost:8080/api/register", {
         name,
         email,
         password,
@@ -205,6 +208,17 @@ const Register = () => {
             {loading ? "Đang xử lý..." : "Đăng ký"}
           </button>
         </form>
+
+        <div className="text-center mt-4">
+          <span className="text-sm text-gray-600">Bạn đã có tài khoản? </span>
+          <button
+            type="button"
+            onClick={() => navigate("/login")}
+            className="text-sm text-blue-600 hover:underline font-medium bg-transparent border-none cursor-pointer"
+          >
+            Đăng nhập
+          </button>
+        </div>
 
         {/* Divider */}
         {/* <div className="mt-8 mb-6">
